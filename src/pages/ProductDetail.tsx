@@ -1,17 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { LoginRequiredModal } from '@/components/LoginRequiredModal'
 import { formatPrice } from '@/lib/format'
 import { publicImageUrl, supabase } from '@/lib/supabase'
+import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import type { Product } from '@/types/database'
 
 export function ProductDetail() {
   const { slug } = useParams()
+  const { user } = useAuth()
   const { addItem } = useCart()
   const [product, setProduct] = useState<Product | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [imageIndex, setImageIndex] = useState(0)
   const [added, setAdded] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
 
   useEffect(() => {
     if (!slug) return
@@ -105,6 +109,10 @@ export function ProductDetail() {
             className="btn btn-primary"
             disabled={product.stock < 1}
             onClick={() => {
+              if (!user) {
+                setLoginOpen(true)
+                return
+              }
               addItem(product, quantity)
               setAdded(true)
             }}
@@ -117,6 +125,12 @@ export function ProductDetail() {
         </div>
         {added && <p className="success">Listo, quedó en el carrito.</p>}
       </div>
+
+      <LoginRequiredModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        next={slug ? `/producto/${slug}` : '/tienda'}
+      />
     </div>
   )
 }

@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { formatPrice } from '@/lib/format'
 import { publicImageUrl } from '@/lib/supabase'
+import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 
 export function Cart() {
+  const { user } = useAuth()
   const { items, subtotalCents, setQuantity, removeItem } = useCart()
 
   if (items.length === 0) {
@@ -75,9 +77,18 @@ export function Cart() {
           <span>{formatPrice(subtotalCents)}</span>
         </div>
         <p className="muted">El envío lo elegís en el checkout.</p>
-        <Link className="btn btn-primary" to="/checkout">
-          Continuar compra
-        </Link>
+        {user ? (
+          <Link className="btn btn-primary" to="/checkout">
+            Continuar compra
+          </Link>
+        ) : (
+          <>
+            <p className="muted">Para comprar tenés que ingresar o crear una cuenta.</p>
+            <Link className="btn btn-primary" to="/auth?next=/checkout">
+              Ingresar para comprar
+            </Link>
+          </>
+        )}
       </aside>
     </div>
   )

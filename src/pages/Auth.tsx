@@ -9,6 +9,9 @@ export function Auth() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [params] = useSearchParams()
+  const nextPath = params.get('next')
+  const safeNext =
+    nextPath && nextPath.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/cuenta'
   const [mode, setMode] = useState<Mode>('login')
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -33,7 +36,7 @@ export function Auth() {
     return () => listener.subscription.unsubscribe()
   }, [params])
 
-  if (user && mode !== 'update') return <Navigate to="/cuenta" replace />
+  if (user && mode !== 'update') return <Navigate to={safeNext} replace />
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
@@ -48,7 +51,7 @@ export function Auth() {
           password,
         })
         if (signInError) throw signInError
-        navigate('/cuenta')
+        navigate(safeNext)
       } else if (mode === 'register') {
         const { error: signUpError } = await supabase.auth.signUp({
           email,
@@ -56,7 +59,7 @@ export function Auth() {
           options: { data: { full_name: fullName } },
         })
         if (signUpError) throw signUpError
-        navigate('/cuenta')
+        navigate(safeNext)
       } else if (mode === 'recover') {
         const redirectTo = `${window.location.origin}/auth?mode=update`
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
@@ -97,7 +100,9 @@ export function Auth() {
             ? 'Te mandamos un link al email para crear una nueva clave.'
             : mode === 'update'
               ? 'Definí tu nueva contraseña.'
-              : 'Registro de comprador para pedidos y cuenta.'}
+              : safeNext === '/checkout'
+                ? 'Ingresá o registrate para completar la compra.'
+                : 'Registro de comprador para pedidos y cuenta.'}
         </p>
 
         {(mode === 'login' || mode === 'register') && (

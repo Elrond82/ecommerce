@@ -58,7 +58,7 @@ export function Checkout() {
   )
   const total = subtotalCents + (shipping?.price_cents ?? 0)
 
-  if (!user) return <Navigate to="/auth" replace />
+  if (!user) return <Navigate to="/auth?next=/checkout" replace />
   if (items.length === 0) return <Navigate to="/tienda" replace />
 
   async function onSubmit(event: FormEvent) {

@@ -1,11 +1,23 @@
+import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ShoppingBag } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 
 export function Layout() {
-  const { user, isAdmin, signOut } = useAuth()
-  const { itemCount } = useCart()
+  const { user, loading, isAdmin, signOut } = useAuth()
+  const { itemCount, clear } = useCart()
+
+  useEffect(() => {
+    if (!loading && !user && itemCount > 0) {
+      clear()
+    }
+  }, [loading, user, itemCount, clear])
+
+  async function handleSignOut() {
+    clear()
+    await signOut()
+  }
 
   return (
     <>
@@ -20,7 +32,7 @@ export function Layout() {
               <>
                 <NavLink to="/cuenta">Cuenta</NavLink>
                 {isAdmin && <NavLink to="/admin">Admin</NavLink>}
-                <button type="button" onClick={() => void signOut()}>
+                <button type="button" onClick={() => void handleSignOut()}>
                   Salir
                 </button>
               </>

@@ -765,6 +765,23 @@ textarea {
   font-size: 0.85rem;
 }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(10, 18, 28, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+  animation: rise 0.2s ease both;
+}
+
+.modal-card {
+  width: min(420px, 100%);
+  box-shadow: var(--shadow);
+}
+
 @keyframes rise {
   from {
     opacity: 0;
