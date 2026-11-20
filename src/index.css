@@ -234,9 +234,28 @@ button.btn.btn-ink {
   justify-self: stretch;
 }
 
-a.btn.btn-ghost {
+a.btn {
+  width: fit-content;
+  height: fit-content;
+  min-height: 0;
   border-radius: 12px;
-  padding: 0.7rem 1.1rem;
+  padding: 0.7rem 1.15rem;
+  justify-self: start;
+  align-self: start;
+}
+
+a.btn.btn-primary {
+  box-shadow: 0 8px 22px rgba(232, 93, 4, 0.24);
+}
+
+.checkout-back {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.checkout-back .btn {
+  width: fit-content;
+  border-radius: 12px;
 }
 
 .btn:hover {

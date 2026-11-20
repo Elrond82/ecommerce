@@ -271,8 +271,8 @@ export function Checkout() {
           Tarjeta de prueba MP: <strong>5031 7557 3453 0604</strong> · Titular{' '}
           <strong>APRO</strong> · Venc. 11/30 · CCV 123
         </p>
-        <div>
-          <Link className="btn btn-ghost" to="/carrito">
+        <div className="checkout-back">
+          <Link className="btn btn-primary" to="/carrito">
             Volver al carrito
           </Link>
         </div>
