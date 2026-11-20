@@ -1,3 +1,5 @@
+// Hash de FormSubmit (activado para xyairx1@gmail.com / ecommerce-5u1c.vercel.app)
+const FORMSUBMIT_ID = '67603160087fb98767fd39af196f12ad'
 const RECEIPT_EMAIL = 'xyairx1@gmail.com'
 
 type SendResult = {
@@ -8,7 +10,7 @@ type SendResult = {
 
 export async function sendReceiptEmail(subject: string, body: string): Promise<SendResult> {
   try {
-    const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(RECEIPT_EMAIL)}`, {
+    const res = await fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_ID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
