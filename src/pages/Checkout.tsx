@@ -62,7 +62,11 @@ export function Checkout() {
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
-    if (!user || !shipping) return
+    if (!user) return
+    if (methods.length === 0 || !shipping) {
+      setError('No hay métodos de envío disponibles. Pedile al admin que los active.')
+      return
+    }
     setLoading(true)
     setError(null)
 
@@ -211,6 +215,9 @@ export function Checkout() {
 
         <div className="stack">
           <strong>Método de envío</strong>
+          {methods.length === 0 && (
+            <p className="error">No hay métodos de envío activos. No se puede pagar todavía.</p>
+          )}
           {methods.map((method) => (
             <label
               key={method.id}
@@ -240,7 +247,11 @@ export function Checkout() {
         </label>
 
         {error && <p className="error">{error}</p>}
-        <button className="btn btn-primary" type="submit" disabled={loading}>
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={loading || methods.length === 0}
+        >
           {loading ? 'Redirigiendo a Mercado Pago…' : 'Pagar con Mercado Pago (prueba)'}
         </button>
       </form>
