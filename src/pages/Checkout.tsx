@@ -151,6 +151,8 @@ export function Checkout() {
         </h1>
         <p className="muted">
           Completá tus datos y pagá con Mercado Pago en modo prueba (no cobra plata real).
+          Abrí el pago en <strong>ventana de incógnito</strong> y no entres con tu cuenta real de
+          Mercado Pago (Yair): eso muestra “algo anduvo mal”.
         </p>
 
         <div className="form-grid two">
@@ -279,8 +281,8 @@ export function Checkout() {
           <span>{formatPrice(total)}</span>
         </div>
         <p className="muted">
-          Tarjeta de prueba MP: <strong>5031 7557 3453 0604</strong> · Titular{' '}
-          <strong>APRO</strong> · Venc. 11/30 · CCV 123
+          Tarjeta: <strong>5031 7557 3453 0604</strong> · Titular <strong>APRO</strong> · Venc.{' '}
+          <strong>11/30</strong> · CVV <strong>123</strong> · DNI <strong>12345678</strong>
         </p>
         <div className="checkout-back">
           <Link className="btn btn-primary" to="/carrito">
