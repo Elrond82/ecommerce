@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { formatPrice } from '@/lib/format'
+import { sendPurchaseReceipts } from '@/lib/sendReceiptEmail'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 
@@ -14,6 +15,8 @@ type ConfirmPayload = {
   buyer_full_name?: string
   buyer_receipt?: string | null
   seller_receipt?: string | null
+  buyer_subject?: string | null
+  seller_subject?: string | null
   error?: string
 }
 
@@ -23,6 +26,7 @@ export function PaymentResult({ kind }: { kind: ResultKind }) {
   const [loading, setLoading] = useState(true)
   const [info, setInfo] = useState<ConfirmPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [mailNote, setMailNote] = useState<string | null>(null)
 
   const orderId = params.get('external_reference') ?? params.get('order_id')
   const paymentId = params.get('payment_id') ?? params.get('collection_id')
@@ -55,6 +59,36 @@ export function PaymentResult({ kind }: { kind: ResultKind }) {
         const payload = data as ConfirmPayload
         if (payload.error) throw new Error(payload.error)
         setInfo(payload)
+
+        if (
+          kind === 'exito' &&
+          payload.status === 'paid' &&
+          payload.buyer_receipt &&
+          payload.seller_receipt
+        ) {
+          const mail = await sendPurchaseReceipts({
+            buyerSubject:
+              payload.buyer_subject ??
+              `NODO — Realizaste una compra por ${formatPrice(payload.total_cents ?? 0)}`,
+            buyerBody: payload.buyer_receipt,
+            sellerSubject:
+              payload.seller_subject ??
+              `NODO — Realizaste una venta por ${formatPrice(payload.total_cents ?? 0)}`,
+            sellerBody: payload.seller_receipt,
+          })
+
+          if (mail.buyer.needsActivation || mail.seller.needsActivation) {
+            setMailNote(
+              'FormSubmit te mandó un mail a xyairx1@gmail.com para activar el envío. Abrí el link “Activate Form” (mirá spam). Después de activarlo, los próximos comprobantes llegan solos a ese mismo mail.',
+            )
+          } else if (mail.buyer.ok && mail.seller.ok) {
+            setMailNote('Comprobantes enviados a xyairx1@gmail.com (compra + venta).')
+          } else {
+            setMailNote(
+              `No se pudo enviar el mail (${mail.buyer.message}). El comprobante igual quedó en Cuenta.`,
+            )
+          }
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo confirmar el pago')
       } finally {
@@ -63,7 +97,7 @@ export function PaymentResult({ kind }: { kind: ResultKind }) {
     }
 
     void confirm()
-  }, [session?.access_token, orderId, paymentId, mpStatus])
+  }, [session?.access_token, orderId, paymentId, mpStatus, kind])
 
   return (
     <div className="page shell">
@@ -86,6 +120,7 @@ export function PaymentResult({ kind }: { kind: ResultKind }) {
 
         {loading && <p className="muted">Confirmando con Mercado Pago…</p>}
         {error && <p className="error">{error}</p>}
+        {mailNote && <p className={mailNote.includes('Activate') ? 'error' : 'success'}>{mailNote}</p>}
 
         {info && !loading && (
           <div className="stack">
@@ -111,6 +146,12 @@ export function PaymentResult({ kind }: { kind: ResultKind }) {
               <article className="receipt-card">
                 <strong>Comprobante para el comprador</strong>
                 <pre className="receipt-body">{info.buyer_receipt}</pre>
+              </article>
+            )}
+            {info.seller_receipt && (
+              <article className="receipt-card">
+                <strong>Comprobante para el vendedor</strong>
+                <pre className="receipt-body">{info.seller_receipt}</pre>
               </article>
             )}
           </div>
