@@ -1,6 +1,5 @@
 // Hash de FormSubmit (activado para xyairx1@gmail.com / ecommerce-5u1c.vercel.app)
 const FORMSUBMIT_ID = '67603160087fb98767fd39af196f12ad'
-const RECEIPT_EMAIL = 'xyairx1@gmail.com'
 
 type SendResult = {
   ok: boolean
@@ -26,10 +25,10 @@ export async function sendReceiptEmail(subject: string, body: string): Promise<S
     })
 
     const data = (await res.json().catch(() => null)) as
-      | { success?: string; message?: string }
+      | { success?: string | boolean; message?: string }
       | null
 
-    const success = data?.success === 'true' || data?.success === true
+    const success = String(data?.success) === 'true'
     const message = data?.message ?? (res.ok ? 'Enviado' : 'No se pudo enviar el mail')
     const needsActivation = /activat/i.test(message)
 
