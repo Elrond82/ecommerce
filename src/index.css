@@ -214,7 +214,18 @@ h3,
   padding: 0.85rem 1.25rem;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  text-decoration: none;
   transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+button.btn.btn-primary,
+button.btn.btn-ink {
+  width: 100%;
 }
 
 .btn:hover {
