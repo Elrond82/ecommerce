@@ -1,84 +1,339 @@
 ================================================================================
-NODO — E-commerce | Resumen del Proyecto Final
-Desarrollo de Sistemas Web 2026
+                    PROYECTO FINAL — DESARROLLO DE SISTEMAS WEB 2026
+                              NODO — E-commerce
+                         Resumen técnico completo
 ================================================================================
 
-1) NOMBRE DEL PROYECTO
-   NODO — tienda online (e-commerce)
-
-2) REPOSITORIO GITHUB
-   https://github.com/Elrond82/ecommerce
-   Nombre del repositorio: ecommerce
-   Estado: PRIVADO
-
-   IMPORTANTE PARA EL DOCENTE:
-   El repositorio está en privado. Para revisarlo puede:
-   - pedirnos acceso (invitar su usuario de GitHub), o
-   - pasarnos su mail de GitHub y lo agregamos como colaborador.
-
-3) FRONT-END (desplegado)
-   https://ecommerce-5u1c.vercel.app
-   Plataforma: Vercel
-   Tecnologías: React + Vite + TypeScript
-
-4) BACK-END (desplegado)
-   Plataforma: Supabase (cloud)
-   Incluye:
-   - Base de datos PostgreSQL
-   - Autenticación de usuarios
-   - Storage de imágenes de productos
-   - API REST con Row Level Security (RLS)
-
 --------------------------------------------------------------------------------
-5) ¿QUÉ HACE LA APLICACIÓN?
+1. DATOS GENERALES DEL PROYECTO
 --------------------------------------------------------------------------------
 
-TIENDA (público, sin login)
-- Home con hero y carrusel de productos
-- Catálogo con filtros por categoría
-- Detalle de producto (descripción, precio, stock, hasta 4 fotos)
-- Se pueden ver productos sin estar logueado
-- Si se intenta agregar al carrito sin sesión, aparece un popup
-  pidiendo ingresar o registrarse
+Nombre comercial:     NODO
+Tipo de aplicación:   E-commerce / tienda online
+Objetivo:             Permitir a una tienda cargar productos, categorías y
+                      métodos de envío, y a los compradores registrarse,
+                      armar un carrito y realizar pedidos.
 
-USUARIOS / AUTH
-- Registro e inicio de sesión
-- Recuperación de contraseña por email
-- Mensaje de bienvenida al registrarse / confirmación por email
-- Cuenta del comprador con datos personales y pedidos
-- Al cerrar sesión, el carrito se vacía
+Repositorio GitHub:   https://github.com/Elrond82/ecommerce
+Nombre del repo:      ecommerce
+Visibilidad:          PRIVADO
 
-COMPRA
-- Carrito de compras (solo con sesión)
-- Checkout con datos de envío
-- Métodos de envío con distintos precios y tiempos
-- Pedidos guardados en la base de datos
+Front-End (producción):
+  https://ecommerce-5u1c.vercel.app
+  Plataforma de despliegue: Vercel
 
-PANEL ADMINISTRADOR
-- Resumen (cantidad de productos, categorías y pedidos)
-- Productos: alta, edición, stock, precio, fotos (máx. 4), activar/ocultar
-- Categorías: alta, edición y borrado
-- Envíos: alta, edición, activar/ocultar y borrado
+Back-End (producción):
+  Proyecto Supabase: "E-commerce"
+  Región: us-east-1
+  URL API: https://gjqwersxsdovgdasvfxn.supabase.co
+  Plataforma: Supabase (PostgreSQL + Auth + Storage + API REST)
 
---------------------------------------------------------------------------------
-6) USUARIOS DE PRUEBA (para el profesor)
---------------------------------------------------------------------------------
+IMPORTANTE — ACCESO AL REPOSITORIO:
+  El repositorio está en modo privado. Para que el docente pueda revisarlo:
+  1) solicitar acceso (invitar su usuario de GitHub como colaborador), o
+  2) enviarnos su mail / usuario de GitHub y lo agregamos nosotros.
 
-ADMINISTRADOR (puede cargar productos, categorías y envíos)
-  Email:    admin@nodo.shop
-  Password: NodoAdmin75!
-
-COMPRADOR (puede armar carrito y comprar)
-  Email:    lucia.martinez@demo.com
-  Password: Prueba123!
 
 --------------------------------------------------------------------------------
-7) STACK RESUMIDO
+2. TECNOLOGÍAS UTILIZADAS
 --------------------------------------------------------------------------------
-- Front-End: React + Vite + TypeScript → Vercel
-- Back-End:  Supabase (Postgres + Auth + Storage) → nube
-- Repo:      GitHub (privado)
+
+2.1 Front-End
+  - Lenguaje:           TypeScript
+  - Librería UI:        React 19
+  - Bundler / tooling:  Vite 8
+  - Enrutamiento:       React Router DOM 7
+  - Cliente backend:    @supabase/supabase-js
+  - Íconos:             lucide-react
+  - Estilos:            CSS propio (variables, layout responsive, animaciones)
+  - Tipografías:        Google Fonts (Syne + Work Sans)
+  - Linter:             Oxlint
+
+2.2 Back-End
+  - Supabase como Backend as a Service (BaaS)
+  - Base de datos:      PostgreSQL 17
+  - Autenticación:      Supabase Auth (email + contraseña)
+  - Almacenamiento:     Supabase Storage (bucket "product-images")
+  - Seguridad:          Row Level Security (RLS) en todas las tablas
+  - API:                PostgREST automática sobre las tablas públicas
+
+2.3 Despliegue y control de versiones
+  - Código:             Git + GitHub
+  - Front:              Vercel (build automático desde rama main)
+  - Back:               Supabase Cloud
+  - Variables de entorno en Vercel:
+      VITE_SUPABASE_URL
+      VITE_SUPABASE_ANON_KEY
+
+
+--------------------------------------------------------------------------------
+3. ARQUITECTURA GENERAL
+--------------------------------------------------------------------------------
+
+  [ Navegador ]
+       |
+       |  React (Vercel)
+       v
+  [ Front-End NODO ]
+       |
+       |  supabase-js (HTTPS)
+       v
+  [ Supabase ]
+       ├── Auth          → usuarios, sesiones, emails de auth
+       ├── Postgres      → productos, categorías, pedidos, etc.
+       ├── Storage       → fotos de productos
+       └── RLS           → permisos por rol (anónimo / autenticado / admin)
+
+El front no guarda secretos del servidor: usa la anon key pública.
+Las reglas de negocio sensibles se controlan con RLS en la base.
+
+
+--------------------------------------------------------------------------------
+4. ESTRUCTURA DEL CÓDIGO (FRONT)
+--------------------------------------------------------------------------------
+
+src/
+  main.tsx                 → punto de entrada React
+  App.tsx                  → rutas generales
+  index.css                → diseño visual global
+
+  lib/
+    supabase.ts            → cliente Supabase + URLs de imágenes
+    format.ts              → formato de precios (ARS) y slugify
+
+  types/
+    database.ts            → tipos TypeScript (Product, Category, etc.)
+
+  context/
+    AuthContext.tsx        → sesión, perfil, admin, logout
+    CartContext.tsx        → carrito en memoria + localStorage
+
+  components/
+    Layout.tsx             → header, nav, footer, limpia carrito al salir
+    ProductCard.tsx        → tarjeta de producto en listados
+    ProductCarousel.tsx    → carrusel automático del home
+    LoginRequiredModal.tsx → popup “tenés que registrarte”
+
+  pages/
+    Home.tsx               → landing + carrusel + recién llegados
+    Catalog.tsx            → tienda con filtros por categoría
+    ProductDetail.tsx      → detalle, fotos, agregar al carrito
+    Cart.tsx               → carrito y acceso a checkout
+    Checkout.tsx           → datos de comprador + envío + pedido
+    Auth.tsx               → login / registro / recuperar / nueva clave
+    Account.tsx            → perfil del comprador + historial de pedidos
+
+    admin/
+      AdminLayout.tsx      → menú admin (solo si is_admin)
+      AdminHome.tsx        → resumen de cantidades
+      AdminProducts.tsx    → ABM productos + fotos
+      AdminCategories.tsx  → ABM categorías
+      AdminShipping.tsx    → ABM métodos de envío
+
+
+--------------------------------------------------------------------------------
+5. RUTAS DE LA APLICACIÓN
+--------------------------------------------------------------------------------
+
+PÚBLICAS
+  /                 Home
+  /tienda           Catálogo
+  /producto/:slug   Detalle de producto
+  /auth             Login / registro / recupero de contraseña
+  /carrito          Carrito (contenido solo con sesión)
+
+CON SESIÓN (COMPRADOR)
+  /checkout         Finalizar compra
+  /cuenta           Datos personales y pedidos
+
+ADMIN (perfil is_admin = true)
+  /admin            Resumen
+  /admin/productos  Gestión de productos
+  /admin/categorias Gestión de categorías
+  /admin/envios     Gestión de envíos
+
+
+--------------------------------------------------------------------------------
+6. FUNCIONALIDADES DETALLADAS
+--------------------------------------------------------------------------------
+
+6.1 Home
+  - Hero de marca “NODO”
+  - Botones a catálogo y registro
+  - Carrusel automático “En rotación” con productos
+  - Sección “Recién llegados”
+
+6.2 Catálogo
+  - Lista todos los productos activos
+  - Filtro por categorías (chips)
+  - Cada producto muestra imagen, nombre, categoría y precio
+
+6.3 Detalle de producto
+  - Nombre, descripción, precio, stock
+  - Galería de hasta 4 imágenes
+  - Selector de cantidad
+  - “Agregar al carrito”:
+      * si hay sesión → agrega
+      * si no hay sesión → popup para ingresar o registrarse
+
+6.4 Autenticación
+  - Registro con nombre, email y contraseña
+  - Login
+  - Recuperar contraseña por email
+  - Definir nueva contraseña desde el link del mail
+  - Mensaje de bienvenida al registrarse
+  - Redirección post-login (ej. volver al checkout)
+
+6.5 Carrito
+  - Solo usable con usuario logueado
+  - Cambiar cantidades / quitar ítems
+  - Resumen de subtotal
+  - Si no hay sesión: “Ingresar para comprar”
+  - Al cerrar sesión: el carrito se vacía automáticamente
+
+6.6 Checkout / pedidos
+  - Requiere login
+  - Formulario de datos del comprador (nombre, teléfono, dirección,
+    ciudad, provincia, CP, notas)
+  - Elección de método de envío (precio + descripción)
+  - Guarda el pedido y sus ítems en la base
+  - Actualiza el perfil del comprador con los datos cargados
+  - Vacía el carrito al confirmar
+
+6.7 Cuenta del comprador
+  - Edición de datos personales / dirección
+  - Listado de pedidos realizados (fecha, estado, total)
+
+6.8 Panel administrador
+  - Acceso restringido por flag is_admin en profiles
+  - Resumen: cantidad de productos, categorías y pedidos
+  - Productos:
+      * crear / editar
+      * nombre, descripción, categoría, precio, stock
+      * subir varias fotos (máximo 4)
+      * borrar fotos individuales
+      * activar / ocultar producto
+  - Categorías:
+      * crear / editar / borrar
+  - Envíos:
+      * crear / editar / borrar
+      * precio y rango de días estimados
+      * activar / ocultar
+
+
+--------------------------------------------------------------------------------
+7. BASE DE DATOS (SUPABASE / POSTGRESQL)
+--------------------------------------------------------------------------------
+
+Tablas principales (schema public), todas con RLS activado:
+
+7.1 profiles
+  - Extiende auth.users
+  - Datos del comprador (nombre, teléfono, dirección, etc.)
+  - Campo is_admin (boolean) para el panel
+
+7.2 categories
+  - name, slug, description, sort_order
+  - Datos actuales de ejemplo: Hogar, Tecnología, Moda, Accesorios
+
+7.3 products
+  - name, slug, description
+  - price_cents (precio en centavos)
+  - stock, is_active
+  - category_id (FK a categories)
+  - Hay productos de ejemplo precargados
+
+7.4 product_images
+  - product_id, storage_path, alt_text, sort_order
+  - Máximo 4 fotos por producto (validación en app + trigger en DB)
+  - Archivos en bucket Storage: product-images
+
+7.5 shipping_methods
+  - name, description, price_cents
+  - estimated_days_min / max
+  - is_active, sort_order
+  - Ejemplos: Retiro en tienda, Envío estándar, Envío express
+
+7.6 orders
+  - user_id, status (pending/paid/shipped/delivered/cancelled)
+  - montos: subtotal, envío, total
+  - datos de comprador y dirección de envío al momento del pedido
+
+7.7 order_items
+  - order_id, product_id, product_name
+  - unit_price_cents, quantity, line_total_cents
+
+Seguridad (RLS) — idea general:
+  - Anónimo: puede leer categorías, productos activos, imágenes y envíos activos
+  - Autenticado: puede gestionar su perfil, carrito/checkout y ver sus pedidos
+  - Admin: puede crear/editar/borrar catálogo, imágenes y envíos
+
+
+--------------------------------------------------------------------------------
+8. FLUJOS PRINCIPALES
+--------------------------------------------------------------------------------
+
+A) Visitante
+   Entra → mira home/catálogo/detalle → intenta comprar → popup de registro
+
+B) Nuevo comprador
+   Se registra → (email de bienvenida/confirmación) → ingresa →
+   agrega productos → checkout → confirma pedido → lo ve en “Cuenta”
+
+C) Comprador existente
+   Login → compra normalmente
+   Si olvidó la clave → “Olvidé mi contraseña” → mail → nueva clave
+
+D) Administrador
+   Login con usuario admin → menú Admin →
+   carga/edita productos, categorías y envíos
+
+
+--------------------------------------------------------------------------------
+9. USUARIOS DE PRUEBA PARA EL DOCENTE
+--------------------------------------------------------------------------------
+
+ADMINISTRADOR
+  Email:       admin@nodo.shop
+  Contraseña:  NodoAdmin75!
+  Permisos:    acceso total al panel /admin
+               alta/edición de productos, categorías y envíos
+
+COMPRADOR
+  Email:       lucia.martinez@demo.com
+  Contraseña:  Prueba123!
+  Permisos:    navegar, carrito, checkout, cuenta
+               NO ve el panel admin
+
+
+--------------------------------------------------------------------------------
+10. CUMPLIMIENTO DE LA CONSIGNA
+--------------------------------------------------------------------------------
+
+✔ Proyecto con tecnologías de la materia (JavaScript/TypeScript + React)
+✔ Front-End + Back-End
+✔ Front desplegado en la nube (Vercel)
+✔ Back desplegado en la nube (Supabase / PostgreSQL)
+✔ Base de datos con tablas reales (productos, categorías, pedidos, etc.)
+✔ Repositorio en GitHub con el código del proyecto
+□ Archivo GrupoX.txt del Campus (integrantes + links) — completar con
+  número de grupo y nombres
+□ Subida del archivo a la tarea del Campus
+  Fecha límite: lunes 30 de noviembre, 23:59 hs
+
+
+--------------------------------------------------------------------------------
+11. LINKS RÁPIDOS
+--------------------------------------------------------------------------------
+
+Repositorio:   https://github.com/Elrond82/ecommerce
+Front-End:     https://ecommerce-5u1c.vercel.app
+Back-End:      https://gjqwersxsdovgdasvfxn.supabase.co
+               (proyecto Supabase “E-commerce”)
+
+Repo privado → pedir acceso o enviar mail/usuario de GitHub del docente.
+
 
 ================================================================================
-Fin del resumen
+Fin del documento — NODO E-commerce
 ================================================================================
