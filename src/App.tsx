@@ -9,6 +9,7 @@ import { Cart } from '@/pages/Cart'
 import { Checkout } from '@/pages/Checkout'
 import { Auth } from '@/pages/Auth'
 import { Account } from '@/pages/Account'
+import { PaymentResult } from '@/pages/PaymentResult'
 import { AdminLayout } from '@/pages/admin/AdminLayout'
 import { AdminHome } from '@/pages/admin/AdminHome'
 import { AdminProducts } from '@/pages/admin/AdminProducts'
@@ -29,6 +30,9 @@ export default function App() {
               <Route path="checkout" element={<Checkout />} />
               <Route path="auth" element={<Auth />} />
               <Route path="cuenta" element={<Account />} />
+              <Route path="pago/exito" element={<PaymentResult kind="exito" />} />
+              <Route path="pago/error" element={<PaymentResult kind="error" />} />
+              <Route path="pago/pendiente" element={<PaymentResult kind="pendiente" />} />
               <Route path="admin" element={<AdminLayout />}>
                 <Route index element={<AdminHome />} />
                 <Route path="productos" element={<AdminProducts />} />

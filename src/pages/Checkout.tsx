@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { formatPrice } from '@/lib/format'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
@@ -9,7 +9,6 @@ import type { ShippingMethod } from '@/types/database'
 export function Checkout() {
   const { user, profile } = useAuth()
   const { items, subtotalCents, clear } = useCart()
-  const navigate = useNavigate()
   const [methods, setMethods] = useState<ShippingMethod[]>([])
   const [shippingId, setShippingId] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
@@ -68,15 +67,18 @@ export function Checkout() {
     setError(null)
 
     try {
-      await supabase.from('profiles').update({
-        full_name: form.full_name,
-        phone: form.phone,
-        address_line1: form.address_line1,
-        address_line2: form.address_line2 || null,
-        city: form.city,
-        province: form.province,
-        postal_code: form.postal_code,
-      }).eq('id', user.id)
+      await supabase
+        .from('profiles')
+        .update({
+          full_name: form.full_name,
+          phone: form.phone,
+          address_line1: form.address_line1,
+          address_line2: form.address_line2 || null,
+          city: form.city,
+          province: form.province,
+          postal_code: form.postal_code,
+        })
+        .eq('id', user.id)
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -114,11 +116,25 @@ export function Checkout() {
       const { error: itemsError } = await supabase.from('order_items').insert(lines)
       if (itemsError) throw itemsError
 
+      const { data: pref, error: prefError } = await supabase.functions.invoke(
+        'create-mp-preference',
+        {
+          body: {
+            order_id: order.id,
+            site_url: window.location.origin,
+          },
+        },
+      )
+
+      if (prefError) throw prefError
+      if (!pref?.checkout_url) {
+        throw new Error(pref?.error || 'No se pudo iniciar Mercado Pago')
+      }
+
       clear()
-      navigate('/cuenta?pedido=ok')
+      window.location.href = pref.checkout_url as string
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo crear el pedido')
-    } finally {
+      setError(err instanceof Error ? err.message : 'No se pudo iniciar el pago')
       setLoading(false)
     }
   }
@@ -129,7 +145,9 @@ export function Checkout() {
         <h1 className="page-title" style={{ fontSize: '2rem' }}>
           Checkout
         </h1>
-        <p className="muted">Datos del comprador y envío.</p>
+        <p className="muted">
+          Completá tus datos y pagá con Mercado Pago en modo prueba (no cobra plata real).
+        </p>
 
         <div className="form-grid two">
           <label>
@@ -223,7 +241,7 @@ export function Checkout() {
 
         {error && <p className="error">{error}</p>}
         <button className="btn btn-primary" type="submit" disabled={loading}>
-          {loading ? 'Confirmando…' : 'Confirmar pedido'}
+          {loading ? 'Redirigiendo a Mercado Pago…' : 'Pagar con Mercado Pago (prueba)'}
         </button>
       </form>
 
@@ -249,6 +267,10 @@ export function Checkout() {
           <span>Total</span>
           <span>{formatPrice(total)}</span>
         </div>
+        <p className="muted">
+          Tarjeta de prueba MP: <strong>5031 7557 3453 0604</strong> · Titular{' '}
+          <strong>APRO</strong> · Venc. 11/30 · CCV 123
+        </p>
         <Link className="btn btn-ghost" to="/carrito">
           Volver al carrito
         </Link>
