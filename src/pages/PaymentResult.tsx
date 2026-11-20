@@ -12,6 +12,8 @@ type ConfirmPayload = {
   mp_status?: string | null
   total_cents?: number
   buyer_full_name?: string
+  buyer_receipt?: string | null
+  seller_receipt?: string | null
   error?: string
 }
 
@@ -105,6 +107,12 @@ export function PaymentResult({ kind }: { kind: ResultKind }) {
               <span>Estado en NODO</span>
               <span>{info.status ?? '—'}</span>
             </div>
+            {info.buyer_receipt && (
+              <article className="receipt-card">
+                <strong>Comprobante para el comprador</strong>
+                <pre className="receipt-body">{info.buyer_receipt}</pre>
+              </article>
+            )}
           </div>
         )}
 
