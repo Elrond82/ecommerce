@@ -1,0 +1,84 @@
+================================================================================
+NODO — E-commerce | Resumen del Proyecto Final
+Desarrollo de Sistemas Web 2026
+================================================================================
+
+1) NOMBRE DEL PROYECTO
+   NODO — tienda online (e-commerce)
+
+2) REPOSITORIO GITHUB
+   https://github.com/Elrond82/ecommerce
+   Nombre del repositorio: ecommerce
+   Estado: PRIVADO
+
+   IMPORTANTE PARA EL DOCENTE:
+   El repositorio está en privado. Para revisarlo puede:
+   - pedirnos acceso (invitar su usuario de GitHub), o
+   - pasarnos su mail de GitHub y lo agregamos como colaborador.
+
+3) FRONT-END (desplegado)
+   https://ecommerce-5u1c.vercel.app
+   Plataforma: Vercel
+   Tecnologías: React + Vite + TypeScript
+
+4) BACK-END (desplegado)
+   Plataforma: Supabase (cloud)
+   Incluye:
+   - Base de datos PostgreSQL
+   - Autenticación de usuarios
+   - Storage de imágenes de productos
+   - API REST con Row Level Security (RLS)
+
+--------------------------------------------------------------------------------
+5) ¿QUÉ HACE LA APLICACIÓN?
+--------------------------------------------------------------------------------
+
+TIENDA (público, sin login)
+- Home con hero y carrusel de productos
+- Catálogo con filtros por categoría
+- Detalle de producto (descripción, precio, stock, hasta 4 fotos)
+- Se pueden ver productos sin estar logueado
+- Si se intenta agregar al carrito sin sesión, aparece un popup
+  pidiendo ingresar o registrarse
+
+USUARIOS / AUTH
+- Registro e inicio de sesión
+- Recuperación de contraseña por email
+- Mensaje de bienvenida al registrarse / confirmación por email
+- Cuenta del comprador con datos personales y pedidos
+- Al cerrar sesión, el carrito se vacía
+
+COMPRA
+- Carrito de compras (solo con sesión)
+- Checkout con datos de envío
+- Métodos de envío con distintos precios y tiempos
+- Pedidos guardados en la base de datos
+
+PANEL ADMINISTRADOR
+- Resumen (cantidad de productos, categorías y pedidos)
+- Productos: alta, edición, stock, precio, fotos (máx. 4), activar/ocultar
+- Categorías: alta, edición y borrado
+- Envíos: alta, edición, activar/ocultar y borrado
+
+--------------------------------------------------------------------------------
+6) USUARIOS DE PRUEBA (para el profesor)
+--------------------------------------------------------------------------------
+
+ADMINISTRADOR (puede cargar productos, categorías y envíos)
+  Email:    admin@nodo.shop
+  Password: NodoAdmin75!
+
+COMPRADOR (puede armar carrito y comprar)
+  Email:    lucia.martinez@demo.com
+  Password: Prueba123!
+
+--------------------------------------------------------------------------------
+7) STACK RESUMIDO
+--------------------------------------------------------------------------------
+- Front-End: React + Vite + TypeScript → Vercel
+- Back-End:  Supabase (Postgres + Auth + Storage) → nube
+- Repo:      GitHub (privado)
+
+================================================================================
+Fin del resumen
+================================================================================

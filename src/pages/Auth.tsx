@@ -53,12 +53,27 @@ export function Auth() {
         if (signInError) throw signInError
         navigate(safeNext)
       } else if (mode === 'register') {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const emailRedirectTo = `${window.location.origin}/auth?mode=login&next=${encodeURIComponent(safeNext)}`
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { full_name: fullName } },
+          options: {
+            data: { full_name: fullName },
+            emailRedirectTo,
+          },
         })
         if (signUpError) throw signUpError
+
+        // Si Supabase pide confirmar email, no hay sesión todavía.
+        if (!signUpData.session) {
+          setMode('login')
+          setInfo(
+            '¡Bienvenido/a a NODO! Te enviamos un email de bienvenida para confirmar tu cuenta. Revisá tu bandeja (y spam).',
+          )
+          return
+        }
+
+        setInfo('¡Bienvenido/a a NODO! Tu cuenta ya está lista.')
         navigate(safeNext)
       } else if (mode === 'recover') {
         const redirectTo = `${window.location.origin}/auth?mode=update`
@@ -66,7 +81,7 @@ export function Auth() {
           redirectTo,
         })
         if (resetError) throw resetError
-        setInfo('Te enviamos un email para recuperar la contraseña. Revisá tu bandeja.')
+        setInfo('Te enviamos un email para recuperar la contraseña. Revisá tu bandeja (y spam).')
       } else {
         const { error: updateError } = await supabase.auth.updateUser({ password })
         if (updateError) throw updateError
